@@ -1,17 +1,157 @@
 ---
+import Layout from '../layouts/Layout.astro';
+import { getPosts } from '../lib/wordpress';
 
+const posts = await getPosts();
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title="CULEBRA LAB | The Cinematic Console">
+  <!-- Navigation -->
+  <nav class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-12 h-20 glass-panel border-b border-white/5">
+    <div class="flex items-center gap-6">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary-fixed text-3xl">terminal</span>
+        <span class="font-headline-md text-xl font-bold tracking-[0.2em] text-white">CULEBRA LAB</span>
+      </div>
+      <div class="h-4 w-[1px] bg-white/20"></div>
+      <div class="flex gap-8">
+        <a class="font-label-caps text-[11px] tracking-widest text-primary-fixed" href="#">CORE_SYSTEM</a>
+        <a class="font-label-caps text-[11px] tracking-widest text-on-surface-variant hover:text-white transition-colors" href="#">PROJECTS</a>
+        <a class="font-label-caps text-[11px] tracking-widest text-on-surface-variant hover:text-white transition-colors" href="#">ARCHIVE</a>
+      </div>
+    </div>
+    <div class="flex items-center gap-6">
+      <div class="text-right hidden xl:block">
+        <p class="font-label-caps text-[9px] text-on-surface-variant uppercase tracking-tighter">Uplink Status</p>
+        <p class="font-code text-[11px] text-primary-fixed">ENCRYPTED_SIGNAL_STABLE</p>
+      </div>
+      <button class="material-symbols-outlined text-on-surface-variant hover:text-primary-fixed transition-colors text-2xl">settings</button>
+    </div>
+  </nav>
+
+  <main class="relative pt-40 pb-20 max-w-[1440px] mx-auto px-12 grid grid-cols-12 gap-12">
+    <!-- Hero Column -->
+    <div class="col-span-12 lg:col-span-8 space-y-12">
+      <header class="space-y-6">
+        <div class="inline-flex items-center gap-3 px-4 py-1.5 border border-primary-container/30 bg-primary-container/5 rounded-full">
+          <span class="w-1.5 h-1.5 bg-primary-container rounded-full animate-pulse"></span>
+          <span class="text-primary-container font-label-caps text-[10px] tracking-widest">MISSION_PROTOCOL: SEMANA_01</span>
+        </div>
+        <div class="space-y-2">
+          <h2 class="text-[clamp(3rem,8vw,6.5rem)] font-headline-lg font-bold leading-[0.9] tracking-tighter text-white">
+            ASTRO <span class="text-primary-fixed">+</span><br />WORDPRESS
+          </h2>
+          <div class="flex items-baseline gap-4">
+            <p class="text-3xl font-light text-on-surface-variant tracking-tight italic">Headless Architecture // REST API Integration</p>
+          </div>
+        </div>
+      </header>
+
+      <!-- Post Display -->
+      <div class="pt-8">
+        {posts.length > 0 && (
+          <div class="space-y-4 border-l-2 border-primary-fixed pl-6 py-4">
+            <time class="font-code text-[10px] text-primary-fixed uppercase tracking-widest block">
+              {new Date(posts[0].date).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+            </time>
+            <h3 class="text-3xl font-headline-md font-bold text-white leading-tight">
+              {posts[0].title.rendered}
+            </h3>
+            <div class="text-on-surface-variant font-body-md leading-relaxed" set:html={posts[0].excerpt.rendered} />
+            <a href={posts[0].link} target="_blank" class="inline-flex items-center gap-3 group cursor-pointer mt-4">
+              <div class="w-10 h-10 rounded-full border border-primary-fixed/30 flex items-center justify-center group-hover:bg-primary-fixed/10 transition-all">
+                <span class="material-symbols-outlined text-primary-fixed text-lg">arrow_forward</span>
+              </div>
+              <span class="font-label-caps text-xs tracking-widest text-primary-fixed group-hover:text-white transition-colors">READ FULL POST</span>
+            </a>
+          </div>
+        )}
+      </div>
+    </div>
+
+    <!-- Sidebar Data Column -->
+    <div class="col-span-12 lg:col-span-4 space-y-8">
+      <!-- Terminal Module -->
+      <div class="glass-panel border-white/10 p-1 rounded-lg cinematic-shadow relative overflow-hidden group">
+        <div class="scanline"></div>
+        <div class="bg-black/80 p-5 font-code text-[11px] space-y-2 text-primary-fixed/80 min-h-[180px]">
+          <div class="flex gap-3"><span class="text-white/40">01</span> [SYSTEM] Initializing Astro-WP Bridge...</div>
+          <div class="flex gap-3"><span class="text-white/40">02</span> [FETCH] GET /wp-json/wp/v2/posts?per_page=3</div>
+          <div class="flex gap-3"><span class="text-white/40">03</span> [SUCCESS] 200 OK (142ms)</div>
+          <div class="flex gap-3"><span class="text-white/40">04</span> [DOM] Static site regeneration complete.</div>
+          <div class="flex gap-3 animate-pulse"><span class="text-primary-fixed">&gt;</span> _</div>
+        </div>
+      </div>
+
+      <!-- Metrics Section -->
+      <div class="space-y-4">
+        <div class="flex justify-between items-end border-b border-white/5 pb-4">
+          <div class="space-y-1">
+            <p class="font-label-caps text-[10px] text-on-surface-variant">NODE_01</p>
+            <p class="text-4xl font-headline-md font-bold text-white">{posts.length.toString().padStart(2, '0')}</p>
+          </div>
+          <p class="font-label-caps text-[9px] text-primary-fixed/60 mb-2">POSTS_READY</p>
+        </div>
+        <div class="flex justify-between items-end border-b border-white/5 pb-4">
+          <div class="space-y-1">
+            <p class="font-label-caps text-[10px] text-on-surface-variant">LATENCY</p>
+            <p class="text-4xl font-headline-md font-bold text-white">&lt;200<span class="text-lg font-light text-on-surface-variant ml-1">ms</span></p>
+          </div>
+          <p class="font-label-caps text-[9px] text-primary-fixed/60 mb-2">FASTEST_IN_CLASS</p>
+        </div>
+        <div class="flex justify-between items-end border-b border-white/5 pb-4">
+          <div class="space-y-1">
+            <p class="font-label-caps text-[10px] text-on-surface-variant">API_TUNNEL</p>
+            <div class="flex items-center gap-3">
+              <p class="text-4xl font-headline-md font-bold text-primary-fixed">ACTIVE</p>
+              <span class="material-symbols-outlined text-primary-fixed">check_circle</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Author Card -->
+      <div class="p-6 bg-white/5 border border-white/10 rounded-xl space-y-6">
+        <div class="flex items-center gap-4">
+          <div class="w-14 h-14 rounded-full border-2 border-primary-fixed p-0.5 bg-surface-container flex items-center justify-center">
+            <span class="text-2xl">🐍</span>
+          </div>
+          <div>
+            <p class="font-headline-md text-white font-bold leading-none">Cris Culebras</p>
+            <p class="font-code text-[11px] text-primary-fixed mt-1">Lead Tech Architect</p>
+          </div>
+        </div>
+        <div class="pt-4 border-t border-white/5">
+          <p class="font-label-caps text-[10px] text-on-surface-variant tracking-tighter uppercase mb-1">Target Host</p>
+          <p class="font-code text-xs text-white">cms.darumaproducciones.es</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Status Bar -->
+  <footer class="fixed bottom-0 left-0 w-full h-10 glass-panel border-t border-white/5 flex items-center justify-between px-12 z-50">
+  <div class="flex items-center gap-8">
+    <div class="flex items-center gap-2">
+      <div class="w-2 h-2 rounded-full bg-primary-container neon-accent"></div>
+      <span class="font-label-caps text-[9px] text-on-surface-variant">SYSTEM_READY</span>
+    </div>
+    <span class="font-label-caps text-[9px] text-white/20">|</span>
+    <div class="flex items-center gap-4">
+      <span class="font-label-caps text-[9px] text-on-surface-variant">ASTRO v6.2</span>
+      <span class="font-label-caps text-[9px] text-white/20">·</span>
+      <span class="font-label-caps text-[9px] text-on-surface-variant">TAILWIND v3</span>
+      <span class="font-label-caps text-[9px] text-white/20">·</span>
+      <span class="font-label-caps text-[9px] text-on-surface-variant">WP REST API</span>
+    </div>
+  </div>
+  <div class="flex items-center gap-6">
+    <span class="font-label-caps text-[9px] text-primary-fixed tracking-widest animate-pulse">DEPLOY_PRODUCTION_ENABLED</span>
+    <div class="flex items-center gap-1">
+      <div class="w-1 h-3 bg-primary-fixed/20"></div>
+      <div class="w-1 h-3 bg-primary-fixed/40"></div>
+      <div class="w-1 h-3 bg-primary-fixed"></div>
+    </div>
+  </div>
+</footer>
+</Layout>
