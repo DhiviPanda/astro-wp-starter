@@ -1,40 +1,34 @@
 ---
-import { Image } from 'astro:assets';
-
 interface Props {
   src: string;
+  localPath?: string;
   alt: string;
-  width?: number;
+  width: number;
   height?: number;
   class?: string;
+  loading?: 'lazy' | 'eager';
 }
 
-const { src, alt, width = 800, height, class: className } = Astro.props;
+const { 
+  src, 
+  localPath, 
+  alt, 
+  width, 
+  height, 
+  class: className = '',
+  loading = 'lazy' 
+} = Astro.props;
 
-// Si es URL externa (WordPress), usar img tag con loading lazy
-const isExternal = src.startsWith('http');
+// Si tenemos localPath, usar esa (ya está optimizada)
+// Si no, usar src original
+const imageSrc = localPath || src;
 ---
 
-{isExternal ? (
-  <img
-    src={src}
-    alt={alt}
-    width={width}
-    height={height}
-    loading="lazy"
-    decoding="async"
-    class={className}
-  />
-) : (
-  <Image
-    src={src}
-    alt={alt}
-    width={width}
-    height={height}
-    format="webp"
-    quality={80}
-    loading="lazy"
-    decoding="async"
-    class={className}
-  />
-)}
+<img 
+  src={imageSrc}
+  alt={alt}
+  width={width}
+  height={height}
+  loading={loading}
+  class={className}
+/>

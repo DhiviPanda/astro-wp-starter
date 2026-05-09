@@ -2,9 +2,28 @@
 import Layout from '../layouts/Layout.astro';
 import OptimizedImage from '../components/OptimizedImage.astro';
 import { getPosts, getFeaturedImage } from '../lib/wordpress';
+import { downloadAndOptimizeImage } from '../lib/downloadImage';
 
 const posts = await getPosts();
-const firstPostImage = posts.length > 0 ? getFeaturedImage(posts[0]) : null;
+
+// Descargar y optimizar imágenes en build time
+for (const post of posts) {
+  const featuredImage = getFeaturedImage(post);
+  if (featuredImage?.url) {
+    const localPath = await downloadAndOptimizeImage(
+      featuredImage.url,
+      `post-${post.id}-featured`
+    );
+    post.featuredImage = {
+      ...featuredImage,
+      localPath
+    };
+  }
+}
+
+const firstPostImage = posts.length > 0 && posts[0].featuredImage 
+  ? posts[0].featuredImage 
+  : null;
 ---
 
 <Layout title="CULEBRA LAB | The Cinematic Console">
@@ -58,6 +77,7 @@ const firstPostImage = posts.length > 0 ? getFeaturedImage(posts[0]) : null;
               <div class="mb-4 -ml-6">
                 <OptimizedImage
                   src={firstPostImage.url}
+                  localPath={firstPostImage.localPath}
                   alt={firstPostImage.alt}
                   width={1200}
                   height={600}
@@ -93,7 +113,8 @@ const firstPostImage = posts.length > 0 ? getFeaturedImage(posts[0]) : null;
           <div class="flex gap-3"><span class="text-white/40">01</span> [SYSTEM] Initializing Astro-WP Bridge...</div>
           <div class="flex gap-3"><span class="text-white/40">02</span> [FETCH] GET /wp-json/wp/v2/posts?per_page=3</div>
           <div class="flex gap-3"><span class="text-white/40">03</span> [SUCCESS] 200 OK (142ms)</div>
-          <div class="flex gap-3"><span class="text-white/40">04</span> [DOM] Static site regeneration complete.</div>
+          <div class="flex gap-3"><span class="text-white/40">04</span> [OPTIMIZE] Images cached & optimized</div>
+          <div class="flex gap-3"><span class="text-white/40">05</span> [DOM] Static site regeneration complete.</div>
           <div class="flex gap-3 animate-pulse"><span class="text-primary-fixed">&gt;</span> _</div>
         </div>
       </div>
