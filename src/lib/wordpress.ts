@@ -8,16 +8,28 @@ interface WPPost {
   };
   date: string;
   link: string;
+  _embedded?: {
+    'wp:featuredmedia'?: Array<{
+      source_url: string;
+      alt_text: string;
+      media_details: {
+        width: number;
+        height: number;
+      };
+    }>;
+  };
 }
 
 const WP_API_URL = 'https://cms.darumaproducciones.es/wp-json/wp/v2';
 
 export async function getPosts(): Promise<WPPost[]> {
   try {
-    const response = await fetch(`${WP_API_URL}/posts`);
+    // Importante: ?_embed para obtener imágenes destacadas
+    const response = await fetch(`${WP_API_URL}/posts?_embed`);
     
     if (!response.ok) {
-      throw new Error(`Error fetching posts: ${response.status}`);
+      console.error(`WordPress API error: ${response.status}`);
+      return [];
     }
     
     const posts: WPPost[] = await response.json();
@@ -28,18 +40,16 @@ export async function getPosts(): Promise<WPPost[]> {
   }
 }
 
-export async function getPost(id: number): Promise<WPPost | null> {
-  try {
-    const response = await fetch(`${WP_API_URL}/posts/${id}`);
-    
-    if (!response.ok) {
-      throw new Error(`Error fetching post: ${response.status}`);
-    }
-    
-    const post: WPPost = await response.json();
-    return post;
-  } catch (error) {
-    console.error(`Error fetching WordPress post ${id}:`, error);
-    return null;
-  }
+// Helper para obtener imagen destacada
+export function getFeaturedImage(post: WPPost) {
+  const media = post._embedded?.['wp:featuredmedia']?.[0];
+  
+  if (!media) return null;
+  
+  return {
+    url: media.source_url,
+    alt: media.alt_text || post.title.rendered,
+    width: media.media_details.width,
+    height: media.media_details.height
+  };
 }
